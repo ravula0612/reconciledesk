@@ -69,9 +69,22 @@ export function report(result) {
     ["Raw payment amount", result.raw], ["Applied payment amount", result.appliedTotal],
     ["Excluded payment amount", result.excluded], ["Payment control difference", result.raw - result.appliedTotal - result.excluded],
   ];
-  return zip({ ...template,
-    "xl/worksheets/sheet1.xml": worksheet(summary),
-    "xl/worksheets/sheet2.xml": worksheet([orderHeaders, ...result.orderRows]),
-    "xl/worksheets/sheet3.xml": worksheet([paymentHeaders, ...result.paymentRows]),
+  return workbook({
+    Summary: summary,
+    Orders: [orderHeaders, ...result.orderRows],
+    Payments: [paymentHeaders, ...result.paymentRows],
   });
+}
+
+export function workbook(sheets) {
+  const entries = Object.entries(sheets);
+  if (entries.length !== 3 || entries.some(([name]) => !/^[A-Za-z][A-Za-z ]{0,30}$/.test(name)))
+    throw new Error("Expected three Excel sheets with valid names.");
+  const files = { ...template };
+  files["xl/workbook.xml"] = files["xl/workbook.xml"].replace(/name="(Summary|Orders|Payments)"/g,
+    (_, name) => 'name="' + entries[["Summary", "Orders", "Payments"].indexOf(name)][0] + '"');
+  for (const [index, [, rows]] of entries.entries()) {
+    files["xl/worksheets/sheet" + (index + 1) + ".xml"] = worksheet(rows);
+  }
+  return zip(files);
 }
