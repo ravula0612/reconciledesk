@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Commission Audit | ReconcileDesk</title>
+  <meta name="description" content="Compare invoice and project cost exports and review commission differences.">
+  <style>
+    :root{color-scheme:light;--ink:#172923;--muted:#4b665a;--line:#d5e0d9;--accent:#144e38;--surface:#fff;--canvas:#f3f7f3}
+    *{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:16px/1.55 "Segoe UI",system-ui,sans-serif}
+    header{background:#112d23;color:#fff}header nav,main{width:min(1130px,calc(100% - 36px));margin:auto}
+    nav{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:10px 0}
+    nav a{color:#dcf5e6}a{color:var(--accent);text-underline-offset:3px}.brand{font-weight:800;text-decoration:none}
+    main{padding:48px 0 60px}h1,h2,h3,p{margin:0}h1{font-size:clamp(2.5rem,6vw,4.2rem);line-height:1.02;letter-spacing:-.055em}
+    h2{font-size:1.45rem;letter-spacing:-.02em}.intro{color:var(--muted);max-width:660px;margin:13px 0 28px;font-size:1.12rem}
+    .panel{padding:clamp(15px,3vw,24px);border:1px solid var(--line);border-radius:16px;background:var(--surface);margin-bottom:16px}
+    .grid,.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px;margin:16px 0}
+    .input,.metric{background:#f6f9f6;border:1px solid var(--line);border-radius:12px;padding:13px;min-width:0}
+    label,strong{display:block;font-weight:700}small,.muted{color:var(--muted)}small{display:block;overflow-wrap:anywhere}
+    input[type=file]{display:block;width:100%;margin-top:9px}input,select,button{font:inherit}
+    input[type=text],select{border:1px solid #709083;background:#fff;color:var(--ink);border-radius:8px;padding:8px 10px;width:100%}
+    button,input::file-selector-button{background:var(--accent);color:#fff;border:1px solid transparent;border-radius:8px;padding:8px 13px;font-weight:650;cursor:pointer}
+    input::file-selector-button{padding:5px 7px;margin-right:6px;font-size:.86rem}.secondary{background:#e8f2eb;color:#183e2e;border-color:#c6d9cc}
+    button:disabled{opacity:.55;cursor:wait}.row{display:flex;gap:11px;align-items:center;flex-wrap:wrap}.spread{justify-content:space-between}
+    .rate{max-width:165px;margin:0 0 14px}.metric strong{font-size:1.55rem;overflow-wrap:anywhere}#status{margin-top:10px;color:#8b2723}
+    .scroll{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:8px;min-height:54px}
+    table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}th,td{padding:8px 11px;border-bottom:1px solid var(--line)}
+    th{position:sticky;top:0;background:#eaf2ec;z-index:1}td:last-child{white-space:normal;min-width:200px;overflow-wrap:anywhere}
+    #explanation{padding:12px;background:#ecf5ef;border-radius:9px;margin-top:9px;overflow-wrap:anywhere}.inspect{margin-top:20px}
+    details{margin-top:14px}summary{cursor:pointer;font-weight:650}.note{margin-top:8px}#counter{margin-top:6px}
+    :focus-visible{outline:3px solid #5e9f81;outline-offset:3px}[hidden]{display:none!important}
+  </style>
+  <script type="module" src="./commission-audit.mjs"></script>
+</head>
+<body>
+  <header><nav aria-label="Main"><a class="brand" href="./">ReconcileDesk</a><a href="./">Order and payment reconciliation</a></nav></header>
+  <main>
+    <h1>Commission audit</h1>
+    <p class="intro">Compare invoice and project cost exports before payroll. Review missing costs, duplicate records, and differences from your commission sheet.</p>
+    <section class="panel" aria-labelledby="input-heading">
+      <h2 id="input-heading">Audit inputs</h2>
+      <form id="audit-form">
+        <div class="grid">
+          <div class="input"><label for="invoices">Invoices CSV</label><small>invoice_id, sales_rep, invoice_amount</small><input id="invoices" type="file" accept=".csv,text/csv" required></div>
+          <div class="input"><label for="costs">Project costs CSV</label><small>cost_id, invoice_id, cost_amount</small><input id="costs" type="file" accept=".csv,text/csv" required></div>
+          <div class="input"><label for="recorded">Recorded commissions CSV <span class="muted">(optional)</span></label><small>invoice_id, recorded_commission</small><input id="recorded" type="file" accept=".csv,text/csv"></div>
+        </div>
+        <div class="rate"><label for="rate">Commission rate (%)</label><input id="rate" type="text" inputmode="decimal" value="10" required></div>
+        <div class="row">
+          <button id="run" type="submit">Run audit</button>
+          <button id="demo" type="button" class="secondary">Try sample data</button>
+          <button id="samples" type="button" class="secondary" aria-expanded="false" aria-controls="sample-picker">Choose sample CSV</button>
+        </div>
+        <div id="sample-picker" class="row note" hidden>
+          <button id="sample-invoices" type="button" class="secondary">Download invoices</button>
+          <button id="sample-costs" type="button" class="secondary">Download project costs</button>
+          <button id="sample-recorded" type="button" class="secondary">Download recorded commissions</button>
+        </div>
+      </form>
+      <p id="status" role="alert" hidden></p>
+      <details>
+        <summary>File requirements and calculation</summary>
+        <p class="note muted">Use UTF-8 CSVs for one period and one currency. Each file can have up to 100,000 rows and be up to 10 MB. Use one row per invoice, a unique ID per cost, and nonnegative decimal amounts. Include a zero-cost row if an invoice has no cost. Files are processed in your browser.</p>
+        <p class="note muted">The same rate applies to each invoice. Commission is rounded to cents per invoice and calculated on positive gross profit. Missing or duplicate linked costs and duplicate invoice IDs put the calculation on hold.</p>
+      </details>
+    </section>
+    <section id="results" class="panel" aria-labelledby="results-heading" hidden>
+      <div class="row spread"><h2 id="results-heading" tabindex="-1">Audit results</h2><button id="export" type="button">Download Excel report</button></div>
+      <p id="source" class="muted note"></p>
+      <div id="metrics" class="metrics"></div>
+      <label for="filter">Show invoices</label>
+      <select id="filter">
+        <option value="all">All invoices</option><option value="review">Invoices with findings</option>
+        <option value="held">Calculations on hold</option><option value="difference">Commission differences</option>
+      </select>
+      <div class="scroll" tabindex="0" aria-label="Invoice review table"><table id="invoice-table"></table></div>
+      <p class="muted" id="counter" aria-live="polite"></p>
+      <div class="inspect">
+        <form id="explain-form">
+          <label for="invoice-id">Explain an invoice</label>
+          <div class="row"><input id="invoice-id" type="text" placeholder="e.g. INV-1002" required style="width:min(100%,260px)"><button type="submit" class="secondary">Show evidence</button></div>
+        </form>
+        <div id="explanation" aria-live="polite" hidden></div>
+      </div>
+      <details>
+        <summary id="input-title">Input audit</summary>
+        <div class="scroll" tabindex="0" aria-label="Cost and commission input audit"><table id="input-table"></table></div>
+      </details>
+    </section>
+  </main>
+</body>
+</html>
