@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ReconcileDesk — Order and payment reconciliation</title>
+<title>ReconcileDesk - Order and payment reconciliation</title>
 <meta name="description" content="Find unpaid orders, mismatched amounts, and duplicate payments from two CSV exports.">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#0c171a;color:#e9f2ef;font:16px/1.5 "Segoe UI",system-ui,sans-serif}main,header{max-width:1100px;margin:auto;padding:0 24px}header{padding-top:24px;display:flex;align-items:center;gap:10px;font-weight:700}header span{background:#b9f5d4;color:#10251d;padding:5px 9px;border-radius:8px}h1{font-size:clamp(40px,7vw,76px);line-height:1.03;letter-spacing:-.06em;margin:0;max-width:840px}h2{margin:0;font-size:25px;letter-spacing:-.03em}.hero{padding:62px 0 32px}.hero p{max-width:630px;color:#b8cac6;font-size:19px}.panel{background:#152427;border:1px solid #314447;border-radius:18px;padding:clamp(16px,4vw,30px);margin-bottom:24px}.grid,.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px;margin:18px 0}.input,.metric{background:#0e1c1e;border:1px solid #35494b;border-radius:12px;padding:15px}label,strong{display:block}small,.muted{color:#afc2be}input[type=file]{display:block;width:100%;margin-top:12px;color:inherit}button,input::file-selector-button{background:#b9f5d4;color:#142923;border:0;font:inherit;font-weight:700;border-radius:8px;padding:10px 15px;cursor:pointer}input::file-selector-button{padding:5px 8px;margin-right:7px;font-size:13px}.secondary{background:#243a3b;color:#e4f6ef}.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}a{color:#b9f5d4}.metric strong{font-size:27px}.scroll{overflow:auto;max-height:430px}table{width:100%;border-collapse:collapse;white-space:nowrap;text-align:left}td,th{padding:9px 11px;border-bottom:1px solid #35494b}th{position:sticky;top:0;background:#152427}details{margin-top:18px}summary{cursor:pointer}#error{color:#ffbbae}footer{color:#afc2be;padding:0 0 30px}[hidden]{display:none!important}
@@ -11,7 +11,7 @@
 </style>
 <script type="module" src="./app.mjs"></script>
 </head>
-<body><header><span>RD</span> ReconcileDesk</header><main>
+<body><header><span>RD</span> ReconcileDesk <a href="./commission-audit.html" style="margin-left:auto">Commission audit</a></header><main>
 <section class="hero"><h1>See which orders got paid.</h1><p>Compare order and payment exports to find missing payments, duplicate IDs, and amount differences. Your files are processed in your browser.</p></section>
 <section class="panel" aria-labelledby="run-title"><h2 id="run-title">Run a reconciliation</h2><div class="grid">
 <div class="input"><label for="orders">Orders CSV</label><small>order_id, order_amount</small><input id="orders" type="file" accept=".csv,text/csv"></div>
@@ -26,4 +26,4 @@
 <a class="pilot-button" href="https://github.com/ravula0612/reconciledesk/issues/new?title=Reconciliation%20pilot%20inquiry&amp;body=Which%20two%20tools%20or%20exports%20do%20you%20compare%3F%0A%0AHow%20often%20do%20you%20reconcile%20them%3F%0A%0AWhich%20exceptions%20would%20you%20like%20the%20report%20to%20flag%3F%0A%0APlease%20describe%20the%20workflow%20only.%20This%20issue%20is%20public.%20Leave%20out%20files%2C%20transaction%20details%2C%20and%20contact%20information.">Request a reconciliation pilot</a>
 <p class="muted"><small>Opens a public GitHub request. Describe the tools and files you use without attaching records or sharing contact details.</small></p>
 </section>
-<footer>ReconcileDesk · Order and payment exports</footer></main></body></html>
+<footer>ReconcileDesk � Order and payment exports</footer></main></body></html>
